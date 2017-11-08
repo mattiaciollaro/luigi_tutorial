@@ -5,72 +5,14 @@
 #
 # Required modules
 #
-import __main__
 import os
-import sys
-import json
-
 from textwrap import TextWrapper
 
-#
-# Some utilities
-#
-def write_section(section_name):
-    """
-    Writes section names for configuration files in the format
-    [section_name]
-
-    Args:
-        section_name: a string representing the section name
-
-    Returns:
-        the string [section_name]\n
-    """
-
-    return '[{}]\n'.format(section_name)
-
-def write_option(option_name, option_value, last=False):
-    """
-    Writes option and value pairs for configuration files in the
-    format option=value
-
-    Args:
-        option_name: a string representing the option name
-        option_value: a string representing the option value
-        last: a boolean; if True, a new line is added at the end
-
-    Returns:
-        the string option_name=option_value if last is False or
-        the string option_name=option_value\n if last is True
-    """
-
-    out = '{}={}\n'.format(option_name, option_value)
-
-    if last:
-        out += '\n'
-
-    return out
-
-def get_script_name():
-    """
-    Gets the name of the current script being executed
-
-    This function returns the name of the current script being executed
-    if the Python session is run in non-interactive mode.
-
-    Returns:
-        a string with the name of the script, if the script executed in
-        non-interactive mode; otherwise, the function returns None
-    """
-    
-    # check whether Python is in interactive mode
-    interactive = not hasattr(__main__, '__file__')
-
-    if interactive:
-        return None
-    else:
-        script_name = os.path.basename(sys.argv[0])
-        return script_name
+from util import (
+	write_section,
+	write_option,
+	get_script_name
+)
 
 max_chars_per_line = 100
 
@@ -89,6 +31,23 @@ pretty_print('=== This is {} ===\n'.format(script_name), 1)
 
 # get this path
 this_path = os.getcwd()
+
+# make an output path for the output of the tutorial tasks
+os.makedirs(os.path.join(this_path, 'output'))
+
+#
+# Create local configuration file
+#
+pretty_print('Writing local configuration file...')
+
+conf_file_path = os.path.join(this_path, 'local.conf')
+with open(conf_file_path, 'w') as local_conf_file:
+    # [paths]
+    local_conf_file.write(write_section('paths'))
+    local_conf_file.write(write_option('luigi_tutorial_path', this_path))
+
+pretty_print('Done.')
+pretty_print('Local configuration file saved to {}'.format(conf_file_path), 1)
 
 #
 # Create luigi configuration file
