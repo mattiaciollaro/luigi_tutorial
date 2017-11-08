@@ -81,8 +81,8 @@ def get_config(section, option):
 
     parser = ConfigParser()
 
-    cf = path.join(
-        path.dirname(path.realpath(__file__)),
+    cf = os.path.join(
+        os.path.dirname(os.path.realpath(__file__)),
         'local.conf'
     )
 
