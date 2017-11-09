@@ -8,6 +8,7 @@ import luigi
 from util import get_config
 
 repo_path = get_config('paths', 'luigi_tutorial_path')
+notebook_path = os.path.join(repo_path, 'notebooks')
 output_path = os.path.join(repo_path, 'output')
 
 class TellMeMyName(luigi.Task):
@@ -104,3 +105,66 @@ class TellMeMyCityAgain(luigi.Task):
 
         with open(self.output().path, 'w') as out:
             out.write(text)
+
+class PrepareData(JupyterNotebookTask):
+    """
+    A notebook that produces synthetic classification data.
+    """
+    nb_path = os.path.join(notebooks_path, 'Prepare Data.ipynb')
+    kernel_name = 'python3'
+    timeout = 60
+
+    def output(self):
+        return [
+            luigi.LocalTarget(
+                os.path.join(output_path, 'model_ready_data.csv')
+            )
+        ]
+
+class FitModel(JupyterNotebookTask):
+    """
+    A notebook that fits a Random Forest classifier.
+    """
+    notebook_path = os.path.join(notebooks_path, 'Fit Model.ipynb')
+    kernel_name = 'python3'
+    
+    parameters = {
+        'n_estimators': 200,
+        'criterion': 'entropy',
+        'max_features': 30
+    }
+
+    def requires(self):
+        return {
+            'data': PrepareData()
+        }
+
+    def output(self):
+        return {
+            'model_fit': luigi.LocalTarget(
+                os.path.join(output_path, 'model_fit.pkl')
+            )
+        }
+
+class ProduceDiagnostics(JupyterNotebookTask):
+    """
+    A notebook that produces some visualizations about the Random Forest
+    classifier fit.
+    """
+    nb_path = os.path.join(notebooks_path, 'Produce Diagnostics.ipynb')
+    kernel_name = 'r_ker'
+    
+    def requires(self):
+        return {
+            'model': FitModel()
+        }
+
+    def output(self):
+        return {
+            'plot_one': luigi.LocalTarget(
+                os.path.join(output_path, plot_one.pdf)
+            ),
+            'plot_two': luigi.LocalTarget(
+                os.path.join(output_path, plot_two.pdf)
+            )
+        }
