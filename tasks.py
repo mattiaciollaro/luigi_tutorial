@@ -6,9 +6,10 @@ import os
 import luigi
 
 from util import get_config
+from jupyter_notebook import JupyterNotebookTask
 
 repo_path = get_config('paths', 'luigi_tutorial_path')
-notebook_path = os.path.join(repo_path, 'notebooks')
+notebooks_path = os.path.join(repo_path, 'notebooks')
 output_path = os.path.join(repo_path, 'output')
 
 class TellMeMyName(luigi.Task):
@@ -110,7 +111,7 @@ class PrepareData(JupyterNotebookTask):
     """
     A notebook that produces synthetic classification data.
     """
-    nb_path = os.path.join(notebooks_path, 'Prepare Data.ipynb')
+    notebook_path = os.path.join(notebooks_path, 'Prepare Data.ipynb')
     kernel_name = 'python3'
     timeout = 60
 
@@ -129,9 +130,9 @@ class FitModel(JupyterNotebookTask):
     kernel_name = 'python3'
     
     parameters = {
-        'n_estimators': 200,
+        'n_estimators': 50,
         'criterion': 'entropy',
-        'max_features': 30
+        'max_features': 20
     }
 
     def requires(self):
@@ -151,7 +152,7 @@ class ProduceDiagnostics(JupyterNotebookTask):
     A notebook that produces some visualizations about the Random Forest
     classifier fit.
     """
-    nb_path = os.path.join(notebooks_path, 'Produce Diagnostics.ipynb')
+    notebook_path = os.path.join(notebooks_path, 'Produce Diagnostics.ipynb')
     kernel_name = 'r_ker'
     
     def requires(self):
