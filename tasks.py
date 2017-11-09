@@ -8,7 +8,7 @@ import luigi
 from util import get_config
 from jupyter_notebook import JupyterNotebookTask
 
-repo_path = get_config('paths', 'luigi_tutorial_path')
+repo_path = get_config('paths', 'luigi_tutorial')
 notebooks_path = os.path.join(repo_path, 'notebooks')
 output_path = os.path.join(repo_path, 'output')
 

@@ -44,7 +44,7 @@ conf_file_path = os.path.join(this_path, 'local.conf')
 with open(conf_file_path, 'w') as local_conf_file:
     # [paths]
     local_conf_file.write(write_section('paths'))
-    local_conf_file.write(write_option('luigi_tutorial_path', this_path))
+    local_conf_file.write(write_option('luigi_tutorial', this_path))
 
 pretty_print('Done.')
 pretty_print('Local configuration file saved to {}'.format(conf_file_path), 1)
