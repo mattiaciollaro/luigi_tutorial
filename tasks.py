@@ -132,7 +132,7 @@ class FitModel(JupyterNotebookTask):
     parameters = {
         'n_estimators': 50,
         'criterion': 'entropy',
-        'max_features': 20
+        'max_features': 3
     }
 
     def requires(self):
@@ -147,25 +147,23 @@ class FitModel(JupyterNotebookTask):
             )
         }
 
-class ProduceDiagnostics(JupyterNotebookTask):
+class ProducePlot(JupyterNotebookTask):
     """
-    A notebook that produces some visualizations about the Random Forest
+    A notebook that produces a visualization about the Random Forest
     classifier fit.
     """
-    notebook_path = os.path.join(notebooks_path, 'Produce Diagnostics.ipynb')
+    notebook_path = os.path.join(notebooks_path, 'Produce Plot.ipynb')
     kernel_name = 'luigi_tutorial_py3'
-    
+
     def requires(self):
         return {
+            'data': PrepareData(),
             'model': FitModel()
         }
 
     def output(self):
-        return {
-            'plot_one': luigi.LocalTarget(
-                os.path.join(output_path, plot_one.pdf)
-            ),
-            'plot_two': luigi.LocalTarget(
-                os.path.join(output_path, plot_two.pdf)
+        return luigi.LocalTarget(
+            os.path.join(
+                output_path, 'importances_plot.png'
             )
-        }
+        )
