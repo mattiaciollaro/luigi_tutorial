@@ -116,11 +116,9 @@ class PrepareData(JupyterNotebookTask):
     timeout = 60
 
     def output(self):
-        return [
-            luigi.LocalTarget(
-                os.path.join(output_path, 'model_ready_data.csv')
-            )
-        ]
+        return luigi.LocalTarget(os.path.join(
+            output_path, 'model_ready_data.csv')
+        )
 
 class FitModel(JupyterNotebookTask):
     """
@@ -136,16 +134,13 @@ class FitModel(JupyterNotebookTask):
     }
 
     def requires(self):
-        return {
-            'data': PrepareData()
-        }
+        return PrepareData()
 
     def output(self):
-        return {
-            'model_fit': luigi.LocalTarget(
-                os.path.join(output_path, 'model_fit.pkl')
-            )
-        }
+        return luigi.LocalTarget(os.path.join(
+            output_path, 
+            'model_fit.pkl'
+        ))
 
 class ProducePlot(JupyterNotebookTask):
     """
@@ -162,8 +157,7 @@ class ProducePlot(JupyterNotebookTask):
         }
 
     def output(self):
-        return luigi.LocalTarget(
-            os.path.join(
-                output_path, 'importances_plot.png'
-            )
-        )
+        return luigi.LocalTarget(os.path.join(
+            output_path, 
+            'importances_plot.png'
+        ))

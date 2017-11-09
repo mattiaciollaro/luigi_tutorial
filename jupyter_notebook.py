@@ -49,14 +49,14 @@ as follows:
     # extract a *user-defined* parameter named `my_par`
     my_par = pars.get('my_par')
 
-The paths of the task's ``self.input()`` and
-``self.output()`` are automatically added to ``parameters`` with keys
-*input* and *output* respectively. These paths are meaningful when
-``self.input()`` and ``self.output()`` return iterables or dictionaries whose
-values are collections of objects which have a ``path`` attribute
-(e.g. one or more objects of class :class:`luigi.local_target.LocalTarget`).
-Whenever this is not the case, the corresponding entries inside of
-``pars.get('input')`` and ``pars.get('output')`` are simply ``None``.
+The paths of the task's ``self.input()`` and ``self.output()`` are automatically
+added to ``parameters`` with keys *input* and *output* respectively.
+These paths are meaningful when ``self.input()`` and ``self.output()`` return
+single objects with the ``path`` attribute, or iterables or dictionaries whose
+values are themselves objects or collections of objects from which the ``path``
+attribute can be extracted (e.g. :class:`luigi.local_target.LocalTarget`).
+Whenever a ``path`` attribute can't be extracted, the corresponding entry
+inside of ``parameters`` is set to ``None``.
 
 :class:`JupyterNotebookTask` inherits from the standard
 :class:`luigi.Task` class. As usual, you should override the
@@ -139,8 +139,9 @@ def _get_path(obj):
     Extracts the `path` attribute from `obj` if available; otherwise, simply
     returns None.
     """
+    obj = _flatten(obj)
     try:
-        out = obj.path
+        out = obj[0].path
     except AttributeError:
         out = None
     return out
@@ -148,14 +149,18 @@ def _get_path(obj):
 
 def _get_path_from_collection(coll):
     """
-    Extracts the `path` attribute from objects organized in a collection (dict
-    or iterable) wherever the `path` attribute is available (else extracts
-    `None`).
+    Extracts the `path` attribute from atomic objects or objects organized in a
+    collection (dict or iterable) wherever the `path` attribute is available
+    (else extracts `None`).
     """
     if isinstance(coll, dict):
         out = {k: _get_path(v) for k, v in coll.items()}
     else:
-        out = [_get_path(v) for v in _flatten(coll)]
+        coll = _flatten(coll)
+        if len(coll) == 1:
+            out = _get_path(coll)
+        else:
+            out = [_get_path(v) for v in _flatten(coll)]
     return out
 
 
@@ -208,18 +213,17 @@ class JupyterNotebookTask(luigi.Task):
         """
         task_input = _flatten(self.input())
         # case 1 - `requires` returns a dictionary
-        # In this case, the output of `_form_input()` is a dictionary whose
-        # entries are themselves dictionaries or lists.
         if isinstance(task_input, dict):
             out = {
-                k: _get_path_from_collection(_flatten(v))
+                k: _get_path_from_collection(v)
                 for k, v in task_input.items()
             }
         # case 2 - `requires` returns a list, iterable, or single object
-        # In this case, the output of `_form_input()` is a list whose entries
-        # are themselves lists or dictionaries.
         else:
-            out = [_get_path_from_collection(v) for v in task_input]
+            if len(task_input) == 1:
+                out = _get_path_from_collection(task_input)
+            else:
+                out = [_get_path_from_collection(v) for v in task_input]
 
         return out
 
@@ -231,13 +235,11 @@ class JupyterNotebookTask(luigi.Task):
         task_output = _flatten(self.output())
         # case 1 - `output` returns a dictionary
         # In this case, the output of `_form_output()` is a dictionary.
-        if isinstance(task_output, dict):
-            out = _get_path_from_collection(task_output)
+        #
         # case 2 - `output` returns a list, iterable, or single object
         # In this case, the output of `_form_output()` is a list.
-        else:
-            out = _get_path_from_collection(task_output)
-
+        out = _get_path_from_collection(task_output)
+        
         return out
 
     def run(self):
