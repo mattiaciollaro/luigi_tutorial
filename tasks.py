@@ -112,7 +112,7 @@ class PrepareData(JupyterNotebookTask):
     A notebook that produces synthetic classification data.
     """
     notebook_path = os.path.join(notebooks_path, 'Prepare Data.ipynb')
-    kernel_name = 'python3'
+    kernel_name = 'luigi_tutorial_py3'
     timeout = 60
 
     def output(self):
@@ -127,7 +127,7 @@ class FitModel(JupyterNotebookTask):
     A notebook that fits a Random Forest classifier.
     """
     notebook_path = os.path.join(notebooks_path, 'Fit Model.ipynb')
-    kernel_name = 'python3'
+    kernel_name = 'luigi_tutorial_py3'
     
     parameters = {
         'n_estimators': 50,
@@ -153,7 +153,7 @@ class ProduceDiagnostics(JupyterNotebookTask):
     classifier fit.
     """
     notebook_path = os.path.join(notebooks_path, 'Produce Diagnostics.ipynb')
-    kernel_name = 'r_ker'
+    kernel_name = 'luigi_tutorial_py3'
     
     def requires(self):
         return {
