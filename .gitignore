@@ -3,6 +3,7 @@
 __pycache__/
 /luigi/
 /output/
+.ipynb_checkpoints
 
 *.log
 *.conf
