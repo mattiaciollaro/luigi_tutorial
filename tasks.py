@@ -48,3 +48,59 @@ class TellMeMyCity(luigi.Task):
 
         with open(self.output().path, 'w') as out:
             out.write(text)
+
+class BrokenTask(luigi.Task):
+    """
+    A broken version of `TellMeMyCity` (missing `requires()`).
+    """
+    my_name = luigi.Parameter()
+    my_city = luigi.Parameter()
+
+
+    def output(self):
+        return luigi.LocalTarget(
+            os.path.join(output_path, 'my_name_and_city.txt')
+        )
+
+    def run(self):
+        with open(self.input().path) as name:
+            text = name.read().strip()
+
+        text += '\nYour city is %s' % self.my_city
+
+        with open(self.output().path, 'w') as out:
+            out.write(text)
+
+class BrokenTellMeMyName(luigi.Task):
+    """
+    A broken version of `TellMeMyName`.
+    """
+    my_name = luigi.Parameter()
+
+    def run(self):
+        with open(self.output().path, 'w') as out:
+            out.write('Your name is %s' % self.my_name)
+
+class TellMeMyCityAgain(luigi.Task):
+    """
+    Same as `TellMeMyCity`.
+    """
+    my_name = luigi.Parameter()
+    my_city = luigi.Parameter()
+
+    def requires(self):
+        return BrokenTellMeMyName(my_name=self.my_name)
+
+    def output(self):
+        return luigi.LocalTarget(
+            os.path.join(output_path, 'my_name_and_city.txt')
+        )
+
+    def run(self):
+        with open(self.input().path) as name:
+            text = name.read().strip()
+
+        text += '\nYour city is %s' % self.my_city
+
+        with open(self.output().path, 'w') as out:
+            out.write(text)
