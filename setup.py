@@ -170,7 +170,5 @@ pretty_print('#' * max_chars_per_line, 1)
 pretty_print('Please copy and paste the following to your ~/.bash_profile:', 1)
 pretty_print('export PYTHONPATH=$PYTHONPATH:{}'.format(this_path))
 pretty_print('export LUIGI_CONFIG_PATH={}'.format(luigi_conf_path), 1)
-pretty_print('Then, save the updated ~/.bash_profile file and source it by '
-             'executing:', 1)
-pretty_print('source ~/.bash_profile', 1)
+pretty_print('Then, close and reopen the Terminal application.', 1)
 pretty_print('#' * max_chars_per_line)
