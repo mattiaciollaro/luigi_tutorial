@@ -112,8 +112,8 @@ class PrepareData(JupyterNotebookTask):
     A notebook that produces synthetic classification data.
     """
     notebook_path = os.path.join(notebooks_path, 'Prepare Data.ipynb')
-
     kernel_name = 'luigi_tutorial_py3'
+    timeout = 60
 
     def output(self):
         return luigi.LocalTarget(os.path.join(
@@ -125,7 +125,6 @@ class FitModel(JupyterNotebookTask):
     A notebook that fits a Random Forest classifier.
     """
     notebook_path = os.path.join(notebooks_path, 'Fit Model.ipynb')
-
     kernel_name = 'luigi_tutorial_py3'
 
     n_estimators = luigi.Parameter(
@@ -157,21 +156,21 @@ class ProducePlot(JupyterNotebookTask):
     notebook_path = luigi.Parameter(
         default=os.path.join(notebooks_path, 'Produce Plot.ipynb')
     )
-    
+
     kernel_name = luigi.Parameter(
         default='luigi_tutorial_py3'
     )
 
     n_estimators = luigi.Parameter(
-        default=50
+        default=200
     )
 
     criterion = luigi.Parameter(
-        default='entropy'
+        default='gini'
     )
 
     max_features = luigi.Parameter(
-        default=3
+        default=50
     )
 
     def requires(self):
@@ -192,6 +191,14 @@ class ProducePlot(JupyterNotebookTask):
 
 @inherits(FitModel)
 class ProducePlot(JupyterNotebookTask)
+
+    notebook_path = luigi.Parameter(
+        default=os.path.join(notebooks_path, 'Produce Plot.ipynb')
+    )
+
+    kernel_name = luigi.Parameter(
+        default='luigi_tutorial_py3'
+    )
 
     def requires(self):
         return {
