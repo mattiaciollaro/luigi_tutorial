@@ -112,8 +112,8 @@ class PrepareData(JupyterNotebookTask):
     A notebook that produces synthetic classification data.
     """
     notebook_path = os.path.join(notebooks_path, 'Prepare Data.ipynb')
+
     kernel_name = 'luigi_tutorial_py3'
-    timeout = 60
 
     def output(self):
         return luigi.LocalTarget(os.path.join(
@@ -125,14 +125,21 @@ class FitModel(JupyterNotebookTask):
     A notebook that fits a Random Forest classifier.
     """
     notebook_path = os.path.join(notebooks_path, 'Fit Model.ipynb')
-    kernel_name = 'luigi_tutorial_py3'
-    
-    parameters = {
-        'n_estimators': 50,
-        'criterion': 'entropy',
-        'max_features': 3
-    }
 
+    kernel_name = 'luigi_tutorial_py3'
+
+    n_estimators = luigi.Parameter(
+        default=200
+    )
+
+    criterion = luigi.Parameter(
+        default='gini'
+    )
+
+    max_features = luigi.Parameter(
+        default=50
+    )
+    
     def requires(self):
         return PrepareData()
 
@@ -147,13 +154,53 @@ class ProducePlot(JupyterNotebookTask):
     A notebook that produces a visualization about the Random Forest
     classifier fit.
     """
-    notebook_path = os.path.join(notebooks_path, 'Produce Plot.ipynb')
-    kernel_name = 'luigi_tutorial_py3'
+    notebook_path = luigi.Parameter(
+        default=os.path.join(notebooks_path, 'Produce Plot.ipynb')
+    )
+    
+    kernel_name = luigi.Parameter(
+        default='luigi_tutorial_py3'
+    )
+
+    n_estimators = luigi.Parameter(
+        default=50
+    )
+
+    criterion = luigi.Parameter(
+        default='entropy'
+    )
+
+    max_features = luigi.Parameter(
+        default=3
+    )
 
     def requires(self):
         return {
             'data': PrepareData(),
-            'model': FitModel()
+            'model': FitModel(
+                n_estimators=self.n_estimators,
+                criterion=self.criterion,
+                max_features=self.max_features
+            )
+        }
+
+    def output(self):
+        return luigi.LocalTarget(os.path.join(
+            output_path, 
+            'importances_plot.png'
+        ))
+
+@inherits(FitModel)
+class ProducePlot(JupyterNotebookTask)
+
+    def requires(self):
+        return {
+            'data': PrepareData(),
+            'model': FitModel(
+                n_estimators=self.n_estimators,
+                criterion=self.criterion,
+                max_features=self.max_features
+            )
         }
 
     def output(self):
