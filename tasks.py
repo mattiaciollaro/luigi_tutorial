@@ -4,6 +4,7 @@
 import os
 
 import luigi
+from luigi.util import inherits
 
 from util import get_config
 from jupyter_notebook import JupyterNotebookTask
@@ -189,29 +190,29 @@ class ProducePlot(JupyterNotebookTask):
             'importances_plot.png'
         ))
 
-@inherits(FitModel)
-class ProducePlot(JupyterNotebookTask)
+# @inherits(FitModel)
+# class ProducePlot(JupyterNotebookTask):
 
-    notebook_path = luigi.Parameter(
-        default=os.path.join(notebooks_path, 'Produce Plot.ipynb')
-    )
+#     notebook_path = luigi.Parameter(
+#         default=os.path.join(notebooks_path, 'Produce Plot.ipynb')
+#     )
 
-    kernel_name = luigi.Parameter(
-        default='luigi_tutorial_py3'
-    )
+#     kernel_name = luigi.Parameter(
+#         default='luigi_tutorial_py3'
+#     )
 
-    def requires(self):
-        return {
-            'data': PrepareData(),
-            'model': FitModel(
-                n_estimators=self.n_estimators,
-                criterion=self.criterion,
-                max_features=self.max_features
-            )
-        }
+#     def requires(self):
+#         return {
+#             'data': PrepareData(),
+#             'model': FitModel(
+#                 n_estimators=self.n_estimators,
+#                 criterion=self.criterion,
+#                 max_features=self.max_features
+#             )
+#         }
 
-    def output(self):
-        return luigi.LocalTarget(os.path.join(
-            output_path, 
-            'importances_plot.png'
-        ))
+#     def output(self):
+#         return luigi.LocalTarget(os.path.join(
+#             output_path, 
+#             'importances_plot.png'
+#         ))
