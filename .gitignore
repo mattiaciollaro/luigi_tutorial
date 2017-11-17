@@ -5,6 +5,7 @@ __pycache__/
 /output/
 .ipynb_checkpoints
 
+*.pyc
 *.log
 *.conf
 
