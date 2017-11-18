@@ -159,8 +159,6 @@ pretty_print('luigi logging configuration file saved to {}\n'.format(
     luigi_logging_conf_path), 1
 )
 
-pretty_print('Done.', 1)
-
 pretty_print('=== All done with {} ==='.format(script_name), 1)
 
 #
